@@ -1,28 +1,44 @@
-export class HashTableLinearProbing {
-    constructor(size) {
-        this.size = size;
-        this.table = new Array(size).fill(null);
+export default class LinearProbingHash {
+  constructor(size = 53) {
+    this.size = size;
+    this.table = new Array(size);
+  }
+
+  _hash(key) {
+    let hash = 0;
+    const PRIME = 31;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * PRIME + key.charCodeAt(i)) % this.size;
+    }
+    return hash;
+  }
+
+  set(key, value) {
+    let index = this._hash(key);
+    let start = index;
+
+    while (this.table[index] && this.table[index][0] !== key) {
+      index = (index + 1) % this.size;
+      if (index === start) return; // tabela cheia
     }
 
-    hashFunction(key) {
-        return key % this.size;
+    this.table[index] = [key, value];
+  }
+
+  get(key) {
+    let index = this._hash(key);
+    let start = index;
+
+    while (this.table[index]) {
+      if (this.table[index][0] === key) return this.table[index][1];
+      index = (index + 1) % this.size;
+      if (index === start) break;
     }
 
-    insert(key, value) {
-        let index = this.hashFunction(key);
-        while (this.table[index] !== null) {
-            index = (index + 1) % this.size; // Sondagem Linear
-        }
-        this.table[index] = { key, value };
-    }
+    return undefined;
+  }
 
-    display() {
-        console.log("Hash Table (Sondagem Linear):", this.table);
-    }
+  has(key) {
+    return this.get(key) !== undefined;
+  }
 }
-
-// Exemplo de Uso
-const hashLinear = new HashTableLinearProbing(10);
-hashLinear.insert(15, "A");
-hashLinear.insert(25, "B");
-hashLinear.display();
